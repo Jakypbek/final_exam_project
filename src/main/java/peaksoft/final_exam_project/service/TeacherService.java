@@ -2,9 +2,7 @@ package peaksoft.final_exam_project.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import peaksoft.final_exam_project.model.Group;
 import peaksoft.final_exam_project.model.Teacher;
-import peaksoft.final_exam_project.repository.GroupRepository;
 import peaksoft.final_exam_project.repository.TeacherRepository;
 
 import java.util.List;
@@ -30,5 +28,14 @@ public class TeacherService {
 
     public void delete(long id) {
         repository.deleteById(id);
+    }
+
+    public void edit(Teacher teacher, Long teacherId) {
+
+        repository.deleteById(teacherId);
+
+        teacher.setId(teacherId);
+
+        repository.save(teacher);
     }
 }

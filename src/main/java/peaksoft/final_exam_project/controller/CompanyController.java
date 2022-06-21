@@ -1,13 +1,11 @@
 package peaksoft.final_exam_project.controller;
 
-
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.ModelAndView;
 import peaksoft.final_exam_project.model.Company;
-import peaksoft.final_exam_project.model.Student;
 import peaksoft.final_exam_project.service.CompanyService;
+import peaksoft.final_exam_project.service.CourseService;
 
 import java.util.List;
 
@@ -15,52 +13,62 @@ import java.util.List;
 @RequestMapping("/api/companies")
 public class CompanyController {
 
-    private final CompanyService service;
+    private final CompanyService companyService;
 
-    public CompanyController(CompanyService service) {
-        this.service = service;
+    public CompanyController(CompanyService companyService) {
+        this.companyService = companyService;
+    }
+
+    @ModelAttribute("companyList")
+    public List<Company> allCompanies() {
+        return companyService.getAllCompanies();
     }
 
     @RequestMapping
-    public String viewCompanyPage(Model model) {
-        List<Company> companies = service.getAllCompanies();
-
-        model.addAttribute("companyList", companies);
-        return "company_page";
+    public String companyPage() {
+        return "companyPage";
     }
 
-    @GetMapping("/new")
-    public String showPage(Model model) {
+    @GetMapping("/save")
+    public String saveCompanyPage(Model model) {
 
-        Company company = new Company();
-        model.addAttribute("company", company);
+        model.addAttribute("emptyCompany", new Company());
 
-        return "new_company";
+        return "saveCompanyPage";
     }
 
     @PostMapping("/save")
-    public String saveCompany(@ModelAttribute("company")Company company) {
+    public String saveCompany(Company company) {
 
-        service.save(company);
+        companyService.save(company);
 
         return "redirect:/api/companies";
     }
 
-    @RequestMapping("/edit/{id}")
-    public ModelAndView showEditPage(@PathVariable long id) {
+    @GetMapping("/edit/{companyId}")
+    public String editCompany(@PathVariable Long companyId, Model model) {
 
-        ModelAndView view = new ModelAndView("edit_company");
-        Company company = service.getById(id);
-        view.addObject("company", company);
-        return view;
+        Company company = companyService.getById(companyId);
+
+        model.addAttribute("company", company);
+
+        return "editCompany";
     }
+    @PostMapping("/edit/{companyId}")
+    public String editCompany(Company company, @PathVariable Long companyId) {
 
 
-    @RequestMapping("/delete/{id}")
-    public String deleteCompany(@PathVariable long id) {
-        service.delete(id);
+        companyService.edit(company, companyId);
+
         return "redirect:/api/companies";
     }
+    @GetMapping("/delete/{companyId}")
+    public String saveStuddfvent(@PathVariable Long companyId) {
 
+
+        companyService.delete(companyId);
+
+        return "redirect:/api/companies";
+    }
 
 }

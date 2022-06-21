@@ -1,11 +1,8 @@
 package peaksoft.final_exam_project.controller;
 
-
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.ModelAndView;
-import peaksoft.final_exam_project.model.Group;
 import peaksoft.final_exam_project.model.Teacher;
 import peaksoft.final_exam_project.service.TeacherService;
 
@@ -15,54 +12,61 @@ import java.util.List;
 @RequestMapping("/api/teachers")
 public class TeacherController {
 
-    private final TeacherService service;
+    private final TeacherService teacherService;
 
-    public TeacherController(TeacherService service) {
-        this.service = service;
+    public TeacherController(TeacherService teacherService) {
+        this.teacherService = teacherService;
     }
 
+    @ModelAttribute("teacherList")
+    public List<Teacher> allTeachers() {
+        return teacherService.getAllTeachers();
+    }
 
     @RequestMapping
-    public String viewGroupPage(Model model) {
-        List<Teacher> teachers = service.getAllTeachers();
-
-        model.addAttribute("teachers", teachers);
-        return "teacher_page";
+    public String teacherPage() {
+        return "teacherPage";
     }
 
-    @GetMapping("/new")
-    public String showPage(Model model) {
+    @GetMapping("/save")
+    public String saveTeacherPage(Model model) {
 
-        Teacher teacher = new Teacher();
-        model.addAttribute("teacher", teacher);
+        model.addAttribute("emptyTeacher", new Teacher());
 
-        return "new_teacher";
+        return "saveTeacherPage";
     }
 
     @PostMapping("/save")
-    public String saveTeacher(@ModelAttribute("teacher")Teacher teacher) {
+    public String saveTeacher(Teacher teacher) {
 
-        service.save(teacher);
+        teacherService.save(teacher);
 
         return "redirect:/api/teachers";
     }
 
-    @RequestMapping("/edit/{id}")
-    public ModelAndView showEditPage(@PathVariable long id) {
+    @GetMapping("/edit/{teacherId}")
+    public String editTeacher(@PathVariable Long teacherId, Model model) {
 
-        ModelAndView view = new ModelAndView("edit_teacher");
-        Teacher teacher = service.getById(id);
-        view.addObject("teacher", teacher);
-        return view;
+        Teacher teacher = teacherService.getById(teacherId);
+
+        model.addAttribute("teacher", teacher);
+
+        return "editTeacher";
     }
+    @PostMapping("/edit/{teacherId}")
+    public String editTeacher(Teacher teacher, @PathVariable Long teacherId) {
 
 
-    @RequestMapping("/delete/{id}")
-    public String deleteGroup(@PathVariable long id) {
-        service.delete(id);
+        teacherService.edit(teacher, teacherId);
+
         return "redirect:/api/teachers";
     }
+    @GetMapping("/delete/{teacherId}")
+    public String delete(@PathVariable Long teacherId) {
 
 
+        teacherService.delete(teacherId);
 
+        return "redirect:/api/teachers";
+    }
 }

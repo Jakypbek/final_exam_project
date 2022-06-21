@@ -2,6 +2,7 @@ package peaksoft.final_exam_project.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import peaksoft.final_exam_project.model.Company;
 import peaksoft.final_exam_project.model.Student;
 import peaksoft.final_exam_project.repository.CompanyRepository;
@@ -28,5 +29,17 @@ public class CompanyService {
 
     public void delete(long id) {
         repository.deleteById(id);
+    }
+
+
+    public void edit(Company company, Long companyId) {
+
+
+        repository.deleteById(companyId);
+
+        company.setId(companyId);
+
+        repository.save(company);
+
     }
 }

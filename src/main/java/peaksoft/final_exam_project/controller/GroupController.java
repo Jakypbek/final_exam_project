@@ -1,12 +1,11 @@
 package peaksoft.final_exam_project.controller;
 
-
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.ModelAndView;
 import peaksoft.final_exam_project.model.Course;
 import peaksoft.final_exam_project.model.Group;
+import peaksoft.final_exam_project.service.CourseService;
 import peaksoft.final_exam_project.service.GroupService;
 
 import java.util.List;
@@ -15,54 +14,69 @@ import java.util.List;
 @RequestMapping("/api/groups")
 public class GroupController {
 
-    private final GroupService service;
+    private final GroupService groupService;
+    private final CourseService courseService;
 
-    public GroupController(GroupService service) {
-        this.service = service;
+    public GroupController(GroupService groupService, CourseService courseService) {
+        this.groupService = groupService;
+        this.courseService = courseService;
     }
 
+    @ModelAttribute("groupList")
+    public List<Group> allGroups() {
+        return groupService.getAllGroups();
+    }
+    @ModelAttribute("courseList")
+    public List<Course> allCourses() {
+        return courseService.getAllCourses();
+    }
 
     @RequestMapping
-    public String viewGroupPage(Model model) {
-        List<Group> groups = service.getAllGroups();
-
-        model.addAttribute("groups", groups);
-        return "group_page";
+    public String groupPage() {
+        return "groupPage";
     }
 
-    @GetMapping("/new")
-    public String showPage(Model model) {
+    @GetMapping("/save")
+    public String saveGroupPage(Model model) {
 
-        Group group = new Group();
-        model.addAttribute("group", group);
+        model.addAttribute("emptyGroup", new Group());
+        model.addAttribute("courses", courseService.getAllCourses());
 
-        return "new_group";
+        return "saveGroupPage";
     }
 
     @PostMapping("/save")
-    public String saveGroup(@ModelAttribute("group")Group group) {
+    public String saveGroup(Group group) {
+        System.out.println(2222);
+        groupService.save(group);
 
-        service.save(group);
 
         return "redirect:/api/groups";
     }
 
-    @RequestMapping("/edit/{id}")
-    public ModelAndView showEditPage(@PathVariable long id) {
+    @GetMapping("/edit/{groupId}")
+    public String editGroup(@PathVariable Long groupId, Model model) {
 
-        ModelAndView view = new ModelAndView("edit_group");
-        Group group = service.getById(id);
-        view.addObject("group", group);
-        return view;
+        Group group = groupService.getById(groupId);
+
+        model.addAttribute("group", group);
+
+        return "editGroup";
     }
+    @PostMapping("/edit/{groupId}")
+    public String editGroup(Group group, @PathVariable Long groupId) {
 
 
-    @RequestMapping("/delete/{id}")
-    public String deleteGroup(@PathVariable long id) {
-        service.delete(id);
+        groupService.edit(group, groupId);
+
         return "redirect:/api/groups";
     }
+    @GetMapping("/delete/{groupId}")
+    public String deleteGroup(@PathVariable Long groupId) {
 
 
+        groupService.delete(groupId);
 
+        return "redirect:/api/groups";
+    }
 }

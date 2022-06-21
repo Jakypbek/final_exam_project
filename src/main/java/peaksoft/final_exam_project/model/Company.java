@@ -24,10 +24,16 @@ public class Company {
     @OneToMany(cascade = {CascadeType.PERSIST,
             CascadeType.MERGE,
             CascadeType.REFRESH,
-            CascadeType.DETACH}, mappedBy = "company")
+            CascadeType.DETACH
+    }, mappedBy = "company")
     private List<Course> courses = new ArrayList<>();
 
     public void setCourse(Course course) {
         this.courses.add(course);
+    }
+
+    @Override
+    public String toString() {
+        return companyName;
     }
 }

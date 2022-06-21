@@ -1,12 +1,11 @@
 package peaksoft.final_exam_project.controller;
 
-
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.ModelAndView;
 import peaksoft.final_exam_project.model.Company;
 import peaksoft.final_exam_project.model.Course;
+import peaksoft.final_exam_project.service.CompanyService;
 import peaksoft.final_exam_project.service.CourseService;
 
 import java.util.List;
@@ -15,54 +14,68 @@ import java.util.List;
 @RequestMapping("/api/courses")
 public class CourseController {
 
-    private final CourseService service;
+    private final CourseService courseService;
+    private final CompanyService companyService;
 
-    public CourseController(CourseService service) {
-        this.service = service;
+    public CourseController(CourseService courseService, CompanyService companyService) {
+        this.courseService = courseService;
+        this.companyService = companyService;
     }
 
-
-    @RequestMapping
-    public String viewCoursePage(Model model) {
-        List<Course> courses = service.getAllCourses();
-
-        model.addAttribute("courseList", courses);
-        return "company_page";
+    @ModelAttribute("courseList")
+    public List<Course> allCourses() {
+        return courseService.getAllCourses();
+    }
+    @ModelAttribute("companyList")
+    public List<Company> allCompanies() {
+        return companyService.getAllCompanies();
     }
 
-    @GetMapping("/new")
-    public String showPage(Model model) {
+    @GetMapping
+    public String coursePage() {
+        return "coursePage";
+    }
 
-        Course course = new Course();
-        model.addAttribute("course", course);
+    @GetMapping("/save")
+    public String saveCoursePage(Model model) {
 
-        return "new_course";
+
+        model.addAttribute("emptyCourse", new Course());
+
+        return "saveCoursePage";
     }
 
     @PostMapping("/save")
-    public String saveCompany(@ModelAttribute("course")Course course) {
+    public String saveCourse(Course course) {
 
-        service.save(course);
+        courseService.save(course);
 
         return "redirect:/api/courses";
     }
 
-    @RequestMapping("/edit/{id}")
-    public ModelAndView showEditPage(@PathVariable long id) {
+    @GetMapping("/edit/{courseId}")
+    public String editCourse(@PathVariable Long courseId, Model model) {
 
-        ModelAndView view = new ModelAndView("edit_course");
-        Course course = service.getById(id);
-        view.addObject("course", course);
-        return view;
+        Course course = courseService.getById(courseId);
+
+        model.addAttribute("course", course);
+
+        return "editCourse";
     }
+    @PostMapping("/edit/{courseId}")
+    public String editCourse(Course course, @PathVariable Long courseId) {
 
 
-    @RequestMapping("/delete/{id}")
-    public String deleteCourse(@PathVariable long id) {
-        service.delete(id);
+        courseService.edit(course, courseId);
+
         return "redirect:/api/courses";
     }
+    @GetMapping("/delete/{courseId}")
+    public String deleteCourse(@PathVariable Long courseId) {
 
 
+        courseService.delete(courseId);
 
+        return "redirect:/api/courses";
+    }
 }

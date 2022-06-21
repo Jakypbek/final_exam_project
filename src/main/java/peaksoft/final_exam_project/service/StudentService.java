@@ -29,4 +29,13 @@ public class StudentService {
     public void delete(long id) {
         repository.deleteById(id);
     }
+
+    public void edit(Student student, Long studentId) {
+
+//        repository.deleteById(studentId);
+
+        student.setId(studentId);
+
+        repository.save(student);
+    }
 }

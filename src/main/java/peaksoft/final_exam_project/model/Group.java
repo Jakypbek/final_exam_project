@@ -26,8 +26,11 @@ public class Group {
     @ManyToMany(cascade = {
             CascadeType.DETACH,
             CascadeType.MERGE,
-            CascadeType.REFRESH,
-            CascadeType.PERSIST})
+            CascadeType.REFRESH})
+    @JoinTable(
+            name = "groups_courses",
+            joinColumns = @JoinColumn(name = "group_id"),
+            inverseJoinColumns = @JoinColumn(name = "course_id"))
     private List<Course> courses = new ArrayList<>();
 
     @OneToMany(cascade = {CascadeType.DETACH,

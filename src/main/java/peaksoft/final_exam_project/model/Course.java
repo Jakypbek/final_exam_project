@@ -21,15 +21,14 @@ public class Course {
     private String courseName;
     private int duration;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.DETACH)
     @JoinColumn(name = "company_id")
     private Company company;
 
     @ManyToMany(cascade = {
             CascadeType.DETACH,
             CascadeType.MERGE,
-            CascadeType.REFRESH,
-            CascadeType.PERSIST}, mappedBy = "courses")
+            CascadeType.REFRESH}, mappedBy = "courses")
     private List<Group> groups = new ArrayList<>();
 
     @OneToOne(cascade = {CascadeType.DETACH,
@@ -41,4 +40,5 @@ public class Course {
     public void setGroup(Group group) {
         this.groups.add(group);
     }
+
 }
